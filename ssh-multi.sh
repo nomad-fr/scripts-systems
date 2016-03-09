@@ -17,6 +17,8 @@ usage() {
     exit 0
 }
 
+# comment bidon
+
 starttmux() {
 
     if [ -z "$HOSTS" ]; then
