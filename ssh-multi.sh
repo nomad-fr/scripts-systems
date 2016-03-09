@@ -44,8 +44,6 @@ while getopts "u:h:" o; do
         esac
 done
 
-# ipmitool -I lanplus -U root -H vmsishost2ipmi -C 3 sol activate                                                                                                                                                                           
-
 if [ ! -z "$TMUX" ]
 then
     starttmux
