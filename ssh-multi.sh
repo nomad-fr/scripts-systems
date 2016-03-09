@@ -1,9 +1,10 @@
-#!/bin/bash                                                                                                                                                                                                                                 
-# ssh-multi                                                                                                                                                                                                                                 
-# D.Kovalov                                                                                                                                                                                                                                 
-# Based on http://linuxpixies.blogspot.jp/2011/06/tmux-copy-mode-and-how-to-control.html                                                                                                                                                    
+#!/bin/bash
 
-# a script to ssh multiple servers over multiple tmux panes                                                                                                                                                                                 
+# ssh-multi
+# D.Kovalov
+# Based on http://linuxpixies.blogspot.jp/2011/06/tmux-copy-mode-and-how-to-control.html
+
+# a script to ssh multiple servers over multiple tmux panes
 
 testssh() {
     echo quit | telnet $1 22 2>/dev/null | grep Connected
