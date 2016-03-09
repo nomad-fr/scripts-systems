@@ -6,13 +6,23 @@
 
 # a script to ssh multiple servers over multiple tmux panes
 
+usage() {
+    echo 'ssh-multi.sh : [OPTION]'
+    echo '   -u user                           : user use for ssh connection'
+    echo '   -d "serv0 serv1 serv2 ... servN"  : list serv to connect to'
+    echo
+    echo '   Bonus:'
+    echo '   -d "$(echo 'serv'{0..3})" <-> -d "serv0 serv1 serv2 serv3"'
+    exit 0
+}
+
 starttmux() {
 
     if [ -z "$HOSTS" ]; then
            echo -n "Please provide of list of hosts separated by spaces [ENTER]: "
            read HOSTS
     fi
- 
+
     local hosts=( $HOSTS )
     local target="ssh-multi ${host[0]}"
     
@@ -33,14 +43,19 @@ starttmux() {
 user=$USER
 HOSTS=''
 
-while getopts "u:h:" o; do
+while getopts "u:d:h" o; do
         case "${o}" in
-            u)
+	    h)
+		usage
+		;;
+	    u)
                 user=${OPTARG}
                 ;;
-            h)
+            d)
                 HOSTS=${OPTARG}
                 ;;
+	    # p)
+	    #	PROTOCOL=${OPTARG}
         esac
 done
 
@@ -48,5 +63,5 @@ if [ ! -z "$TMUX" ]
 then
     starttmux
 else
-    echo 'Must be run in a tmux session !'
+    echo 'ssh-multi.sh : Must be run inside a tmux session !'
 fi
