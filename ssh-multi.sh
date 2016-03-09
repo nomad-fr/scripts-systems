@@ -13,6 +13,7 @@ usage() {
     echo
     echo '   Bonus:'
     echo '   -d "$(echo 'serv'{0..3})" <-> -d "serv0 serv1 serv2 serv3"'
+    echo '   -d "$(anotherscript)" to call a script that give you a list of host"'
     exit 0
 }
 
