@@ -12,7 +12,7 @@ usage() {
     echo $1
     echo
     echo 'ssh-multi.sh : [OPTION]'
-    echo '   -u user                           : user use for ssh connection'
+    echo '   -u user                           : user use for ssh connection : default "root"'
     echo '   -d "serv0 serv1 serv2 ... servN"  : list serv to connect to'
     echo
     echo '   Bonus:'
