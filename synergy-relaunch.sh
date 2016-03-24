@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# synergy-relaunch.sh : a scrtip to relaunch synergy
+# clients & servers base on synergy config file
+
 # note : you must use the same user on each hosts
 
 ## CONFIG
