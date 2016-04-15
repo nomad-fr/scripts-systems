@@ -8,7 +8,7 @@ usage() {
     echo 'query-proxmox-vm.sh : [OPTION]'
     echo ' -d ProxmoxServer'
     echo ' -t type : qemu openvz : default all'
-    echo ' -u up : seulement les machines up'
+    echo ' -u : only network recheable host'
     exit 0
 }
 
