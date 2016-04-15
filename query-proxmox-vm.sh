@@ -16,7 +16,7 @@ checkopt() {
     if [ -z "$serv" ]
     then usage "Please provide a host with -d option."
     else
-	ssh root@$serv "pvecm status" > /dev/null
+	ssh root@$serv "/usr/bin/pveversion" > /dev/null
 	if [ "$?" != 0 ]
 	then usage "please give a Proxmox host"; fi
     fi
