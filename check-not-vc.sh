@@ -11,25 +11,26 @@ usage() {
 }
 
 check-svn() {
-    echo 'Untracked files:'
-    svn status $(svn info $path | head -2 | tail -1 | awk -F':' '{print $2}') | grep ^\?
+    e=$(svn status $(svn info $1 | head -2 | tail -1 | awk -F':' '{print $2}') | grep ^\?)
+    if [ ! -z "$e" ]; then echo 'Untracked files in repo : '$1; echo $e; fi
 }
 
 check-git() {
-    git status
+    e=$(git ls-files . --exclude-standard --others)
+    if [ ! -z "$e" ]; then echo 'Untracked files in repo : '$1; echo $e; fi
 }
 
 check-vc() {
     svn info $path &>/dev/null
     if [ "$?" = 0 ]
     then
-	check-svn
+	check-svn $path
     else
 	cd $path
 	git log &>/dev/null
 	if [ "$?" = 0 ]
 	then
-	    check-git
+	    check-git $path
 	else
 	    usage "$path : is not a repository folder path"
 	fi
