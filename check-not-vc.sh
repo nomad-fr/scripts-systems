@@ -5,6 +5,7 @@
 # nomad-fr : 28.04.2016
 
 usage() {
+    echo $1
     echo $0' "repository folder path"'
     exit 0
 }
@@ -15,7 +16,7 @@ check-svn() {
 }
 
 check-git() {
-    git status 
+    git status
 }
 
 check-vc() {
@@ -26,12 +27,16 @@ check-vc() {
     else
 	cd $path
 	git log &>/dev/null
-	check-git
-    fi		   
+	if [ "$?" = 0 ]
+	then
+	    check-git
+	else
+	    usage "$path : is not a repository folder path"
+	fi
+    fi
 }
 
 if [ "$#" -ne 1 ]; then usage; fi
 path=$1
 
 check-vc
-
