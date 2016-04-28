@@ -39,5 +39,4 @@ check-vc() {
 
 if [ "$#" -ne 1 ]; then usage; fi
 path=$1
-
 check-vc
