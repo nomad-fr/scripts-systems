@@ -30,7 +30,7 @@ find_user_dbuss_address()
     # process to determine DBUS_SESSION_BUS_ADDRESS
     USER_DBUS_PROCESS_NAME="gconfd-2"
     # get pid of user dbus process
-    DBUS_PID=`ps ax | grep $USER_DBUS_PROCESS_NAME | grep -v grep | awk '{ print $1 }' | head -n 1`
+    DBUS_PID=`ps ax | grep $USER_DBUS_PROCESS_NAME | grep -v grep | /usr/bin/awk '{ print $1 }' | head -n 1`
     # get DBUS_SESSION_BUS_ADDRESS variable
     DBUS_SESSION=`grep -z DBUS_SESSION_BUS_ADDRESS /proc/$DBUS_PID/environ | sed -e s/DBUS_SESSION_BUS_ADDRESS=//`
 }
@@ -61,7 +61,7 @@ NOTIFY_SEND_BIN="/usr/bin/notify-send -t $EXPIRE_TIME -i "$icon
 if [ -z "$title" ]; then title='Title of message'; fi
 if [ -z "$message" ]; then message='message test'; fi
 if [ -z "$user" ]; then user=$USER; fi
-
+echo $PATH
 find_user_dbuss_address
 notify
 
