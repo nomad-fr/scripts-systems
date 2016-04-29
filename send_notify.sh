@@ -17,13 +17,8 @@ usage()
 notify() # send notify
 {
     export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION
-    DISPLAY=:0
-    if [ "$USER" = 'root' ]; then
-	su -c "$NOTIFY_SEND_BIN \"$title\" \"$message\"" $user
-    fi
-    if [ "$USER" = "$user" ]; then
-	$(sudo -u $user $NOTIFY_SEND_BIN "$title" "$message")
-    fi
+    export DISPLAY=:0
+    $(sudo -u $user $NOTIFY_SEND_BIN "$title" "$message")
 }
 
 find_user_dbuss_address()
