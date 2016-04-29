@@ -11,23 +11,23 @@ usage() {
 }
 
 check-svn() {
-    e=$(svn status $(svn info $1 | head -2 | tail -1 | awk -F':' '{print $2}') | grep ^\?)
-    if [ ! -z "$e" ]; then echo 'Untracked files in repo : '$1; echo $e; fi
+    e=$(/usr/bin/svn status $(/usr/bin/svn info $1 | head -2 | tail -1 | /usr/bin/awk -F':' '{print $2}') | grep ^\?)
+    if [ ! -z "$e" ]; then echo "$e"; fi
 }
 
 check-git() {
-    e=$(git ls-files . --exclude-standard --others)
-    if [ ! -z "$e" ]; then echo 'Untracked files in repo : '$1; echo $e; fi
+    e=$(/usr/bin/git ls-files . --exclude-standard --others)
+    if [ ! -z "$e" ]; then echo "$e"; fi
 }
 
 check-vc() {
-    svn info $path &>/dev/null
+    /usr/bin/svn info $path &>/dev/null
     if [ "$?" = 0 ]
     then
 	check-svn $path
     else
 	cd $path
-	git log &>/dev/null
+	/usr/bin/git log &>/dev/null
 	if [ "$?" = 0 ]
 	then
 	    check-git $path

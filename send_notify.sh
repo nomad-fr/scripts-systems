@@ -3,13 +3,6 @@
 # send_notify.sh : a script to notify user with notify-send 
 # nomad-fr : https://github.com/nomad-fr/scripts-systems
 
-EXPIRE_TIME=30000 # in millisecond : 30000ms = 30s
-ICON=/usr/share/icons/elementary-xfce/status/128/info.png
-NOTIFY_SEND_BIN="/usr/bin/notify-send -t $EXPIRE_TIME -i $ICON"
-title='Title of message'
-message='message test'
-user=$USER
-
 usage()
 {
     if [ ! -z $1 ]; then echo $1; fi
@@ -17,6 +10,7 @@ usage()
     echo '   -u user'
     echo '   -t title'
     echo '   -m message'
+    echo '   -i icon     : to disable icon : none ' 
     exit 0
 }
 
@@ -41,7 +35,7 @@ find_user_dbuss_address()
     DBUS_SESSION=`grep -z DBUS_SESSION_BUS_ADDRESS /proc/$DBUS_PID/environ | sed -e s/DBUS_SESSION_BUS_ADDRESS=//`
 }
 
-while getopts "u:m:t:h" o; do
+while getopts "u:m:t:hi:" o; do
     case "${o}" in
 	h)
 	    usage
@@ -55,8 +49,18 @@ while getopts "u:m:t:h" o; do
 	t)
 	    title=${OPTARG}
 	    ;;
-    esac
+	i)
+	    icon=${OPTARG}
+	    ;;
+    esac    
 done
+
+EXPIRE_TIME=30000 # in millisecond : 30000ms = 30s
+if [ -z "$icon" ]; then icon=/usr/share/icons/elementary-xfce/status/128/info.png; fi
+NOTIFY_SEND_BIN="/usr/bin/notify-send -t $EXPIRE_TIME -i "$icon
+if [ -z "$title" ]; then title='Title of message'; fi
+if [ -z "message" ]; then message='message test'; fi
+if [ -z "$user" ]; then user=$USER; fi
 
 find_user_dbuss_address
 notify
