@@ -16,10 +16,10 @@ usage()
 
 notify() # send notify
 {
+    export DISPLAY=:0
     if [ "$USER" = 'root' ]; then
 	DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION su -c "$NOTIFY_SEND_BIN \"$title\" \"$message\"" $user
     fi
-
     if [ "$USER" = "$user" ]; then
 	DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION $($NOTIFY_SEND_BIN "$title" "$message")
     fi
@@ -59,7 +59,7 @@ EXPIRE_TIME=30000 # in millisecond : 30000ms = 30s
 if [ -z "$icon" ]; then icon=/usr/share/icons/elementary-xfce/status/128/info.png; fi
 NOTIFY_SEND_BIN="/usr/bin/notify-send -t $EXPIRE_TIME -i "$icon
 if [ -z "$title" ]; then title='Title of message'; fi
-if [ -z "message" ]; then message='message test'; fi
+if [ -z "$message" ]; then message='message test'; fi
 if [ -z "$user" ]; then user=$USER; fi
 
 find_user_dbuss_address
