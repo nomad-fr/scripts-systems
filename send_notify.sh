@@ -16,12 +16,13 @@ usage()
 
 notify() # send notify
 {
-    export DISPLAY=:0
+    export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION
+    
     if [ "$USER" = 'root' ]; then
-	DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION su -c "$NOTIFY_SEND_BIN \"$title\" \"$message\"" $user
+	su -c "$NOTIFY_SEND_BIN \"$title\" \"$message\"" $user
     fi
     if [ "$USER" = "$user" ]; then
-	DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION $($NOTIFY_SEND_BIN "$title" "$message")
+	$(sudo -u $user $NOTIFY_SEND_BIN "$title" "$message")
     fi
 }
 
@@ -61,7 +62,7 @@ NOTIFY_SEND_BIN="/usr/bin/notify-send -t $EXPIRE_TIME -i "$icon
 if [ -z "$title" ]; then title='Title of message'; fi
 if [ -z "$message" ]; then message='message test'; fi
 if [ -z "$user" ]; then user=$USER; fi
-echo $PATH
+
 find_user_dbuss_address
 notify
 
