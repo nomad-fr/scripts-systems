@@ -5,6 +5,8 @@
 
 # note : you must use the same user on each hosts
 
+echo $(basename $0) 
+
 ## CONFIG
 SYNERGY_CONFIG_FILE=~/config/synergy/synergy_ipgp.conf
 ## CONFIG
@@ -16,14 +18,17 @@ SYNERGYS_IP=$(ip a | grep 'state UP' -A2 | grep inet | awk -F' ' '{print substr(
 #SYNERGYS_IP=192.168.0.1
 
 ## get client list from synergy config file
-CLIENTS=$(grep :$ $SYNERGY_CONFIG_FILE | awk -F':' '{sub(/ +/,"",$1); sub(/\t+/,"",$1); print}' | sort | uniq)
+CLIENTS=$(grep :$ $SYNERGY_CONFIG_FILE | awk -F':' '{sub(/ +/,"",$1); sub(/\t+/,"",$1); print}' | sort | uniq | grep -v $(hostname))
 
 ## get pid of running synergy*
 SYNERGY_PIDS=$(ps aux | grep synergy | grep -v grep | grep -v $(basename $0) | awk -F ' ' '{print $2}')
 
 for p in $SYNERGY_PIDS
-do kill -9 "$p"; done
-synergys -d ERROR -c ~/config/synergy/synergy_ipgp.conf
+do
+    kill -9 "$p";
+done
+
+synergys -d ERROR -c $SYNERGY_CONFIG_FILE
 
 for c in $CLIENTS
 do
@@ -31,7 +36,7 @@ do
     ssh -o ConnectTimeout=2 $c echo ok 2>&1
     if [ $? -eq 0 ]
     then
-	for p in $(ssh $c "ps aux | grep synergy | grep -v grep" | awk -F' ' '{print $2}')
+	for p in $(ssh $c "ps aux | grep synergy | grep -v grep" | grep -v $(basename $0) | awk -F' ' '{print $2}')
 	do ssh $c "kill -9 $p"; done
 	ssh $c "synergyc $SYNERGYS_IP"
     fi

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ssh-multi : a script to ssh multiple servers over multiple tmux panes
-# nomad-fr : https://gist.github.com/nomad-fr/8f2316c24c9d488a603b
+# nomad-fr : https://github.com/nomad-fr/scripts-systems
 # Based on D.Kovalov work : https://gist.github.com/dmytro/3984680
 
 # config
