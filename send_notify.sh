@@ -17,7 +17,7 @@ usage()
 notify() # send notify
 {
     export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION
-    
+    DISPLAY=:0
     if [ "$USER" = 'root' ]; then
 	su -c "$NOTIFY_SEND_BIN \"$title\" \"$message\"" $user
     fi
