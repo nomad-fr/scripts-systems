@@ -23,8 +23,8 @@ usage() {
 
 starttmux() {
     local hosts=( $HOSTS )
-    local target="ssh-multi ${host[0]}"
-    tmux new-window -n "${target}" ssh $user@${hosts[0]}
+    local target="multi-ssh ${host[0]}"
+    tmux new-window -n "${target}" 'ssh $user@${hosts[0]}'
     unset hosts[0];
     for i in "${hosts[@]}"
     do
