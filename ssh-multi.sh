@@ -7,6 +7,7 @@
 # config
 #user=$USER # user use for ssh connection
 user=root
+tmux_session_name="multi-ssh"
 
 usage() {
     echo $1
@@ -23,7 +24,7 @@ usage() {
 
 starttmux() {
     local hosts=( $HOSTS )
-    local target="multi-ssh ${host[0]}"
+    local target="multi-ssh"
     tmux new-window -n "${target}" ssh $user@${hosts[0]}
     unset hosts[0];
     for i in "${hosts[@]}"
@@ -40,11 +41,23 @@ checkopt() {
 	usage "Please provide of list of hosts with -d option."
     fi
     if [ -z "$TMUX" ]; then # if not in a tmux session create one
-	tmux -u new-session -d -s multi-ssh
+
+	# here we check that there is not an other session with same name
+	compteur=0
+	tmux_session_name=$(echo -n $tmux_session_name; echo "_"$HOSTS | awk '{print substr($0, 1, 5)}') 
+	for session in $(tmux ls | awk '{print substr($1, 1, length($1)-1)}')
+	do
+	    ((compteur++))
+	    if [ "$session" = "$tmux_session_name" ]; then
+		tmux_session_name=$tmux_session_name"_"$compteur
+	    fi
+	done
+		
+	tmux -u new-session -d -s $tmux_session_name
 	local launchtmux=1
     fi
     starttmux
-    if [ "$launchtmux" = 1 ]; then tmux a -dt multi-ssh; fi
+    if [ "$launchtmux" = 1 ]; then tmux a -dt $tmux_session_name; fi
 }
 
 while getopts "u:d:h" o; do
