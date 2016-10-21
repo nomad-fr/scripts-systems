@@ -44,7 +44,6 @@ checkopt() {
     if [ -z "$TMUX" ]; then # if not in a tmux session create one
 	# check that there is not an other session with same name
 	compteur=0
-	tmux_session_name=$(echo -n $tmux_session_name; echo "_"$HOSTS | awk '{print substr($0, 1, 5)}') 
 	for session in $(tmux ls | awk '{print substr($1, 1, length($1)-1)}')
 	do
 	    ((compteur++))
@@ -52,7 +51,7 @@ checkopt() {
 		tmux_session_name=$tmux_session_name"_"$compteur
 	    fi
 	done
-		tmux -u new-session -d -s $tmux_session_name
+	tmux -u new-session -d -s $tmux_session_name
 	local launchtmux=1
     fi
     starttmux
