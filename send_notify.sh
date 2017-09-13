@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # send_notify.sh : a script to notify user with notify-send 
 # nomad-fr : https://github.com/nomad-fr/scripts-systems
@@ -31,7 +31,7 @@ find_user_dbuss_address()
 
 checkopt()
 {
-    if [ -z "$icon" ]; then icon=/usr/share/icons/elementary-xfce/status/128/info.png; fi
+    if [ -z "$icon" ]; then icon=$ICON; fi
     if [ -z "$title" ]; then title='Title of message'; fi
     if [ -z "$message" ]; then message='message test'; fi
     if [ -z "$user" ]; then user=$USER; fi
@@ -59,7 +59,17 @@ done
 
 USER_DBUS_PROCESS_NAME="gconfd-2"     # process to determine DBUS_SESSION_BUS_ADDRESS
 EXPIRE_TIME=30000 # in millisecond : 30000ms = 30s
-NOTIFY_SEND_BIN="/usr/bin/notify-send -t $EXPIRE_TIME -i "$icon
+NOTIFY=$(which notify-send)
+NOTIFY_SEND_BIN="$NOTIFY -t $EXPIRE_TIME -i "$icon
+
+if [[ "$OSTYPE" == "linux-gnu" ]]
+then
+    ICON=
+elif [[ "$OSTYPE" == "freebsd"* ]]
+then
+    ICON=
+fi
+
 
 checkopt
 find_user_dbuss_address
