@@ -69,10 +69,10 @@ NOTIFY_SEND_BIN="$NOTIFY -t $EXPIRE_TIME -i "$icon
 
 if [[ "$OSTYPE" == "linux-gnu" ]]
 then
-    ICON=
+    ICON=/usr/share/icons/elementary-xfce/status/128/info.png
 elif [[ "$OSTYPE" == "freebsd"* ]]
 then
-    ICON=
+    ICON=/usr/local/share/icons/elementary-xfce/status/128/info.svg
 fi
 
 
