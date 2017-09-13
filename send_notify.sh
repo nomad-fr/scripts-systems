@@ -16,7 +16,7 @@ usage()
 
 notify()
 {
-    export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION
+    #export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION
     export DISPLAY=:0
     $(sudo -u $user $NOTIFY_SEND_BIN "$title" "$message")
 }
@@ -26,7 +26,12 @@ find_user_dbuss_address()
     # get pid of user dbus process
     DBUS_PID=`ps ax | grep $USER_DBUS_PROCESS_NAME | grep -v grep | /usr/bin/awk '{ print $1 }' | head -n 1`
     # get DBUS_SESSION_BUS_ADDRESS variable
-    DBUS_SESSION=`grep -z DBUS_SESSION_BUS_ADDRESS /proc/$DBUS_PID/environ | sed -e s/DBUS_SESSION_BUS_ADDRESS=//`
+    #DBUS_SESSION=`grep -z DBUS_SESSION_BUS_ADDRESS /proc/$DBUS_PID/environ | sed -e s/DBUS_SESSION_BUS_ADDRESS=//`
+    dbus_session_file=~/.dbus/session-bus/$(cat /var/lib/dbus/machine-id)-0
+    if [ -e "$dbus_session_file" ]; then
+	. "$dbus_session_file"
+	export DBUS_SESSION_BUS_ADDRESS
+    fi
 }
 
 checkopt()
