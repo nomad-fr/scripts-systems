@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # check-not-vc.sh : a script to check a that everything in a Version Control
 #                   folder is under Version Control
