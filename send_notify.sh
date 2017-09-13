@@ -36,7 +36,15 @@ find_user_dbuss_address()
 
 checkopt()
 {
-    if [ -z "$icon" ]; then icon=$ICON; fi
+    if [ -z "$icon" ]; then
+	if [[ "$OSTYPE" == "linux-gnu" ]]
+	then
+	    icon=/usr/share/icons/elementary-xfce/status/128/info.png
+	elif [[ "$OSTYPE" == "freebsd"* ]]
+	then
+	    icon=/usr/local/share/icons/elementary-xfce/status/128/info.svg
+	fi
+    fi
     if [ -z "$title" ]; then title='Title of message'; fi
     if [ -z "$message" ]; then message='message test'; fi
     if [ -z "$user" ]; then user=$USER; fi
@@ -62,21 +70,13 @@ while getopts "u:m:t:hi:" o; do
     esac    
 done
 
+checkopt
+
 USER_DBUS_PROCESS_NAME="gconfd-2"     # process to determine DBUS_SESSION_BUS_ADDRESS
 EXPIRE_TIME=30000 # in millisecond : 30000ms = 30s
 NOTIFY=$(which notify-send)
 NOTIFY_SEND_BIN="$NOTIFY -t $EXPIRE_TIME -i "$icon
 
-if [[ "$OSTYPE" == "linux-gnu" ]]
-then
-    ICON=/usr/share/icons/elementary-xfce/status/128/info.png
-elif [[ "$OSTYPE" == "freebsd"* ]]
-then
-    ICON=/usr/local/share/icons/elementary-xfce/status/128/info.svg
-fi
-
-
-checkopt
 find_user_dbuss_address
 notify
 
