@@ -41,21 +41,21 @@ checkopt() {
 	usage "Please provide of list of hosts with -d option."
     fi
     tmux_session_name=$(echo -n $tmux_session_name; echo "_"$HOSTS | awk '{print substr($0, 1, 5)}')
-    echo 'TMUX:'$TMUX
-    # desactivation de ce test car pause pb si X lancé via tmux
-    #if [ -z "$TMUX" ]; then # if not in a tmux session create one
+    if [ -z "$TMUX" ]; then # if not in a tmux session create one
 	# check that there is not an other session with same name
 	compteur=0
 	for session in $(tmux ls | awk '{print substr($1, 1, length($1)-1)}')
 	do
 	    ((compteur++))
-	    if [ "$session" = "$tmux_session_name" ]; then
-		tmux_session_name=$tmux_session_name"_"$compteur
+	    if [ "$session" != "X" ]; then
+		if [ "$session" = "$tmux_session_name" ]; then
+		    tmux_session_name=$tmux_session_name"_"$compteur
+		fi
 	    fi
 	done
 	tmux -u new-session -d -s $tmux_session_name
 	local launchtmux=1
-    #fi
+    fi
     starttmux    
     if [ "$launchtmux" = 1 ]; then
 	tmux a -dt $tmux_session_name
