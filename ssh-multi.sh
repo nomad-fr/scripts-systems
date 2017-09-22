@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ssh-multi : a script to ssh multiple servers over multiple tmux panes
 # nomad-fr : https://github.com/nomad-fr/scripts-systems
