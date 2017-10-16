@@ -25,7 +25,7 @@ from gi.repository import Notify
 APPINDICATOR_ID = 'myappindicator'
 
 def main():
-    indicator = appindicator.Indicator.new(APPINDICATOR_ID, os.path.abspath('sample_icon.svg'), appindicator.IndicatorCategory.SYSTEM_SERVICES)
+    indicator = appindicator.Indicator.new(APPINDICATOR_ID, os.path.abspath('/usr/share/icons/gnome/24x24/emotes/face-smile-big.png'), appindicator.IndicatorCategory.SYSTEM_SERVICES)
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     indicator.set_menu(build_menu())
     gtk.main()
