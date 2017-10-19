@@ -6,6 +6,9 @@
 # source : https://gist.github.com/jmarroyave/a24bf173092a3b0943402f6554a2094d
 # see also : http://www.devdungeon.com/content/desktop-notifications-python-libnotify
 
+# http://candidtim.github.io/appindicator/2014/09/13/ubuntu-appindicator-step-by-step.html
+# http://python-gtk-3-tutorial.readthedocs.io/en/latest/index.html
+
 import os
 import signal
 import json
@@ -21,6 +24,8 @@ gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify
+from subprocess import call
+from subprocess import check_output
 
 APPINDICATOR_ID = 'myappindicator'
 
@@ -30,46 +35,31 @@ def main():
     indicator.set_menu(build_menu())
     gtk.main()
 
-def build_menu():
-    menu = gtk.Menu()
-    item_joke = gtk.MenuItem('Joke')
-    item_joke.connect('activate', joke)
-    menu.append(item_joke)
-
-    item_backup = gtk.MenuItem('Backup')
-    item_backup.connect('activate', backup)
-    menu.append(item_backup)
+def backuplaptop_callback_func():
+    call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh'])
     
-    item_quit = gtk.MenuItem('Quit')
-    item_quit.connect('activate', quit)
+def status(_):
 
-    menu.append(item_quit)
-    menu.show_all()
-    return menu
-
-def my_callback_func():
-    pass
-
-def joke(_):
+    last = check_output(['bash', '/home/nomad/bin/getlastbackup.sh'])
     Notify.init("App Name")
     # Create the notification object
-    summary = "Wake up!"
-    body = "Meeting at 3PM!"
+    summary = "Last snapshot"
+    body = str(last)
     icon = "/usr/share/icons/gnome/24x24/emotes/face-smile-big.png"
     notification = Notify.Notification.new(
         summary,
         body, # Optional
         icon, 
     )
-    notification.add_action(
-        "action_click",
-        "Reply to Message",
-        my_callback_func,
-        None # Arguments
-    )
     notification.show()
 
+def gotobackup(_):
+    ### /!\ A CHANGER
+    os.system('xdg-open "%s"' % '/media/gobt/Backup-houyo/'  )
+    
 def backup(_):
+    backuplaptop_callback_func()
+    
     Notify.init("App Name")
     # Create the notification object
     summary = "Backing up!"
@@ -83,7 +73,7 @@ def backup(_):
     notification.add_action(
         "action_click",
         "Reply to Message",
-        my_callback_func,
+        backuplaptop_callback_func,
         None # Arguments
     )
     notification.show()
@@ -91,6 +81,28 @@ def backup(_):
 def quit(_):
     Notify.uninit()
     gtk.main_quit()
+    
+def build_menu():
+    menu = gtk.Menu()
+
+    item_status = gtk.MenuItem('Status')
+    item_status.connect('activate', status)
+    menu.append(item_status)
+    
+    item_backup = gtk.MenuItem('Backup')
+    item_backup.connect('activate', backup)
+    menu.append(item_backup)
+
+    item_gotobackup = gtk.MenuItem('Go to Backup')
+    item_gotobackup.connect('activate', gotobackup)
+    menu.append(item_gotobackup)
+    
+    item_quit = gtk.MenuItem('Quit')
+    item_quit.connect('activate', quit)
+
+    menu.append(item_quit)
+    menu.show_all()
+    return menu
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
