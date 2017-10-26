@@ -41,21 +41,35 @@ class IndicatorBackup:
             item.set_label('Status')
             #item.connect("activate", self.handler_menu_test)
             item.set_sensitive(False)
+            item.show()
             self.menu.append(item)
 
             # menu Backup
             item = gtk.MenuItem()
             item.set_label("Backup")
             item.connect("activate", self.backup)
+            item.show()
             self.menu.append(item)
             
             # menu quit
             item = gtk.MenuItem()
             item.set_label("Quit")
-            item.connect("activate", quit)
+            item.connect("activate", self.handler_menu_exit)
+            item.show()
             self.menu.append(item)
 
-    
+            self.menu.show()
+            self.indic.set_menu(self.menu)
+
+            # # initialize cpu speed display
+            # self.update_cpu_speeds()
+            # # then start updating every 2 seconds
+            # # http://developer.gnome.org/pygobject/stable/glib-functions.html#function-glib--timeout-add-seconds
+            # GLib.timeout_add_seconds(2, self.handler_timeout)
+            
+    def handler_menu_exit(self, evt):
+        gtk.main_quit()
+            
     def backup():
             call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh'])    
             Notify.init("App Name")
