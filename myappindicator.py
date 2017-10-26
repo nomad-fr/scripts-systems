@@ -11,6 +11,8 @@
 
 # https://openclassrooms.com/courses/pygtk/les-widgets-suite-partie-1
 
+# https://openclassrooms.com/courses/apprenez-a-programmer-en-python/premiere-approche-des-classes
+
 import os
 import signal
 
@@ -101,10 +103,11 @@ def timespent(indicator, menu):
     # changement de l'icon du menu
     indicator.set_icon('/usr/share/icons/gnome/24x24/emotes/face-embarrassed.png')
     # ici rajouter un argument pour faire menu 1 ou menu 2
-    indicator.set_menu(build_menu(menu))
-    print("hello")
-    return True
+    #indicator.set_menu(build_menu(menu))
 
+    #me = indicator.get_menu()
+
+    return True
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
