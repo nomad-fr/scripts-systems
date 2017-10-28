@@ -15,6 +15,7 @@ from gi.repository import Gtk as gtk, GLib, GObject, AppIndicator3 as appindicat
 from subprocess import call, check_output, PIPE, run
 
 import threading
+import time
 
 class IndicatorBackup:
     def __init__(self):
@@ -49,7 +50,7 @@ class IndicatorBackup:
             self.backup_item = gtk.MenuItem()
             self.backup_item.set_label("Backup")
             self.backup_item.set_sensitive(False)
-            self.backup_item.connect("activate", self.backup)
+            self.backup_item.connect("activate", self.backup_t)
             self.backup_item.show()
             self.menu.append(self.backup_item)
             
@@ -63,66 +64,82 @@ class IndicatorBackup:
             self.menu.show()
             self.indic.set_menu(self.menu)
 
-            # thread = threading.Thread(target=self.check_status, args=())
-            # thread.daemon = True        # Daemonize thread
-            # thread.start()              # Start the execution
-
             ## # initialize initial status
-            self.check_status_t()
+            self.check_status_t()        
+            # ## # then start updating every 2 seconds
+            # GLib.timeout_add_seconds(2, self.check_status_t)
             
-            ## # then start updating every 2 seconds
-            GLib.timeout_add_seconds(10, self.check_status_t)
+    def set_notok_status(self, evt):
+        newlabel = 'Backup server : '+str(self.result.stdout)[2:][:-3]
+        self.status_item.set_label(newlabel)
+        self.set_icon('violet')
+        self.backup_item.set_sensitive(False)
+        return True
 
+    def set_ok_status(self, evt):
+        newlabel = 'last backup : '+str(self.result.stdout)[2:][:-3]
+        self.status_item.set_label(newlabel)
+        self.set_icon('vert')
+        self.backup_item.set_sensitive(True)
+        return True
+        
     def check_status_t(self):
         thread = threading.Thread(target=self.check_status, args=())
-        thread.daemon = True        # Daemonize thread
+        thread.daemon = False       # Daemonize thread
         thread.start()              # Start the execution        
-            
+        
     def check_status(self):
-
-        self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-violet-pb.png')
-
         # fonctionne quand l'acce VPN ne fonctionne pas
         
         command=['/home/nomad/bin/backup-laptop-neuronfarm.sh', 'last']
-        result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=False)
+        self.result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=False)
 
-        print(result.returncode, result.stdout, result.stderr)
+        print(self.result.returncode, self.result.stdout, self.result.stderr)
 
-        if str(result.returncode) == '0':
-            newlabel = 'last backup : '+str(result.stdout)
-            self.backup_item.set_sensitive(True)
-        if str(result.returncode) == '1':
-            newlabel = 'Backup server : '+str(result.stdout)
-            self.backup_item.set_sensitive(False)
-        self.status_item.set_label(newlabel)
+        if str(self.result.returncode) == '0':
+            self.set_ok_status(self)
+        if str(self.result.returncode) == '1':
+            self.set_notok_status(self)
+
+        ## # then start updating every 2 seconds
+        GLib.timeout_add_seconds(2, self.check_status_t)
+            
         return True
 
     # https://developer.gnome.org/gnome-devel-demos/stable/gmenu.py.html.en
         
     def handler_menu_exit(self, evt):
+        #self.thread_backup.exit()
         gtk.main_quit()
-            
-    def backup(self):
-            call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh'])    
-            Notify.init("App Name")
-            # Create the notification object
-            summary = "Backing up!"
-            body = "Meeting at 3PM!"
-            icon = "/usr/share/icons/gnome/24x24/emotes/face-smile-big.png"
-            notification = Notify.Notification.new(
-                summary,
-                body, # Optional
-                icon, 
-            )
-            notification.add_action(
-                "action_click",
-                "Reply to Message",
-                backuplaptop_callback_func,
-                None # Arguments
-            )
-            notification.show()            
 
+    def backup_t(self, evt):
+        self.set_icon('bleu')
+        self.backup_item.set_sensitive(False)
+        self.backup_item.set_label('backup in progress ...')
+
+        self.thread_backup = threading.Thread(target=self.backup, args=(evt))
+        self.thread_backup.daemon = False       # Daemonize thread
+        self.thread_backup.start()              # Start the execution        
+        return True
+        
+    def backup(self, evt):
+        call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh'])    
+        self.backup_item.set_label("Backup")
+        self.backup_item.set_sensitive(True)
+        self.set_icon('vert')
+        return True
+        
+    def set_icon(self, color):
+        if color == 'violet':
+            self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-violet-p.png')            
+        if color == 'vert':
+            self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-vert-p.png')            
+        if color == 'bleu':
+            self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-bleu-p.png')            
+        if color == 'rouge':
+            self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-rouge-p.png')            
+        return True
+        
     def main(self):
         gtk.main()
             
