@@ -14,6 +14,8 @@ gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk, GLib, GObject, AppIndicator3 as appindicator, Notify
 from subprocess import call, check_output, PIPE, run
 
+import threading
+
 class IndicatorBackup:
     def __init__(self):
             # param1: identifier of this indicator
@@ -61,24 +63,21 @@ class IndicatorBackup:
             self.menu.show()
             self.indic.set_menu(self.menu)
 
-            # initialize initial status
-            #self.check_status()
-            # then start updating every 2 seconds
-            #
-            GLib.timeout_add_seconds(2, self.check_status)
+            # thread = threading.Thread(target=self.check_status, args=())
+            # thread.daemon = True        # Daemonize thread
+            # thread.start()              # Start the execution
 
-    # def get_cpu_speeds(self):
-    #     """Use regular expression to parse speeds of all CPU cores from
-    #     /proc/cpuinfo on Linux.
-    #     """
+            ## # initialize initial status
+            self.check_status_t()
+            
+            ## # then start updating every 2 seconds
+            GLib.timeout_add_seconds(10, self.check_status_t)
 
-    #     f = open('/proc/cpuinfo')
-    #     # this gives us e.g. ['2300', '2300']
-    #     s = re.findall('cpu MHz\s*:\s*(\d+)\.', f.read())
-    #     # this will give us ['2.3', '2.3']
-    #     f = ['%.1f' % (float(i) / 1000,) for i in s]
-    #     return f
-
+    def check_status_t(self):
+        thread = threading.Thread(target=self.check_status, args=())
+        thread.daemon = True        # Daemonize thread
+        thread.start()              # Start the execution        
+            
     def check_status(self):
 
         self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-violet-pb.png')
@@ -90,10 +89,10 @@ class IndicatorBackup:
 
         print(result.returncode, result.stdout, result.stderr)
 
-        if result.returncode == 0:
+        if str(result.returncode) == '0':
             newlabel = 'last backup : '+str(result.stdout)
             self.backup_item.set_sensitive(True)
-        if result.returncode != 0:
+        if str(result.returncode) == '1':
             newlabel = 'Backup server : '+str(result.stdout)
             self.backup_item.set_sensitive(False)
         self.status_item.set_label(newlabel)
