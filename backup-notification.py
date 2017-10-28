@@ -65,9 +65,9 @@ class IndicatorBackup:
             self.indic.set_menu(self.menu)
 
             ## # initialize initial status
-            self.check_status_t()        
-            # ## # then start updating every 2 seconds
-            # GLib.timeout_add_seconds(2, self.check_status_t)
+            self.check_status()        
+            ## # then start updating every 2 seconds
+            GLib.timeout_add_seconds(2, self.check_status)
             
     def set_notok_status(self, evt):
         newlabel = 'Backup server : '+str(self.result.stdout)[2:][:-3]
@@ -84,13 +84,11 @@ class IndicatorBackup:
         return True
         
     def check_status_t(self):
-        thread = threading.Thread(target=self.check_status, args=())
-        thread.daemon = False       # Daemonize thread
-        thread.start()              # Start the execution        
+        self.thread = threading.Thread(target=self.check_status, args=())
+        self.thread.daemon = False       # Daemonize thread
+        self.thread.start()              # Start the execution        
         
     def check_status(self):
-        # fonctionne quand l'acce VPN ne fonctionne pas
-        
         command=['/home/nomad/bin/backup-laptop-neuronfarm.sh', 'last']
         self.result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=False)
 
@@ -102,7 +100,7 @@ class IndicatorBackup:
             self.set_notok_status(self)
 
         ## # then start updating every 2 seconds
-        GLib.timeout_add_seconds(2, self.check_status_t)
+        #GLib.timeout_add_seconds(2, self.check_status)
             
         return True
 
