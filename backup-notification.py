@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import os
 import signal
 
@@ -13,7 +12,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
 from gi.repository import Gtk as gtk, GLib, GObject, AppIndicator3 as appindicator, Notify
-from subprocess import call, check_output
+from subprocess import call, check_output, PIPE, run
 
 class IndicatorBackup:
     def __init__(self):
@@ -37,18 +36,20 @@ class IndicatorBackup:
             self.menu = gtk.Menu()
 
             # menu status
-            status = gtk.MenuItem()
-            status.set_label('Status : nothing yet')
-            status.set_sensitive(False)
-            status.show()
-            self.menu.append(status)
+            self.status_item = gtk.MenuItem()
+            #status.set_label('Status : nothing yet')
+            self.status_item.set_label('init ...')
+            self.status_item.set_sensitive(False)
+            self.status_item.show()
+            self.menu.append(self.status_item)
 
             # menu Backup
-            backup = gtk.MenuItem()
-            backup.set_label("Backup")
-            backup.connect("activate", self.backup)
-            backup.show()
-            self.menu.append(backup)
+            self.backup_item = gtk.MenuItem()
+            self.backup_item.set_label("Backup")
+            self.backup_item.set_sensitive(False)
+            self.backup_item.connect("activate", self.backup)
+            self.backup_item.show()
+            self.menu.append(self.backup_item)
             
             # menu quit
             out = gtk.MenuItem()
@@ -63,7 +64,8 @@ class IndicatorBackup:
             # initialize initial status
             #self.check_status()
             # then start updating every 2 seconds
-            #GLib.timeout_add_seconds(2, self.check_status)
+            #
+            GLib.timeout_add_seconds(2, self.check_status)
 
     # def get_cpu_speeds(self):
     #     """Use regular expression to parse speeds of all CPU cores from
@@ -78,26 +80,31 @@ class IndicatorBackup:
     #     return f
 
     def check_status(self):
+
         self.indic.set_icon('/local/VersionControl/GitHub/nomad-fr/scripts-systems/icon-backup-notification/icon-pitit-chien-violet-pb.png')
-        stat=call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh', 'last'])
-        # return True so that we get called again
-        # returning False will make the timeout stop
+
+        # fonctionne quand l'acce VPN ne fonctionne pas
         
+        command=['/home/nomad/bin/backup-laptop-neuronfarm.sh', 'last']
+        result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=False)
+
+        print(result.returncode, result.stdout, result.stderr)
+
+        if result.returncode == 0:
+            newlabel = 'last backup : '+str(result.stdout)
+            self.backup_item.set_sensitive(True)
+        if result.returncode != 0:
+            newlabel = 'Backup server : '+str(result.stdout)
+            self.backup_item.set_sensitive(False)
+        self.status_item.set_label(newlabel)
         return True
+
+    # https://developer.gnome.org/gnome-devel-demos/stable/gmenu.py.html.en
         
-    # def handler_timeout(self):
-    #     """This will be called every few seconds by the GLib.timeout.
-    #     """
-    #     # read, parse and put cpu speeds in the label
-    #     self.update_cpu_speeds()
-    #     # return True so that we get called again
-    #     # returning False will make the timeout stop
-    #     return True
-    
     def handler_menu_exit(self, evt):
         gtk.main_quit()
             
-    def backup():
+    def backup(self):
             call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh'])    
             Notify.init("App Name")
             # Create the notification object
