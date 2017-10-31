@@ -19,6 +19,10 @@ import time
 
 class IndicatorBackup:
     def __init__(self):
+
+            self.lock = threading.Lock()
+            self.value = 0
+
             # param1: identifier of this indicator
             # param2: name of icon. this will be searched for in the standard them
             # dirs
@@ -63,7 +67,7 @@ class IndicatorBackup:
 
             self.menu.show()
             self.indic.set_menu(self.menu)
-
+            
             ## # initialize initial status
             self.check_status()        
             ## # then start updating every 2 seconds
@@ -84,48 +88,53 @@ class IndicatorBackup:
         return True
         
     def check_status_t(self):
+
         self.thread = threading.Thread(target=self.check_status, args=())
         self.thread.daemon = False       # Daemonize thread
         self.thread.start()              # Start the execution        
         
     def check_status(self):
+        print(self.value)
+
         command=['/home/nomad/bin/backup-laptop-neuronfarm.sh', 'last']
         self.result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=False)
-
         print(self.result.returncode, self.result.stdout, self.result.stderr)
-
+            
         if str(self.result.returncode) == '0':
             self.set_ok_status(self)
         if str(self.result.returncode) == '1':
             self.set_notok_status(self)
-
-        ## # then start updating every 2 seconds
-        #GLib.timeout_add_seconds(2, self.check_status)
             
         return True
 
-    # https://developer.gnome.org/gnome-devel-demos/stable/gmenu.py.html.en
+# https://developer.gnome.org/gnome-devel-demos/stable/gmenu.py.html.en
         
     def handler_menu_exit(self, evt):
         #self.thread_backup.exit()
         gtk.main_quit()
-
+        
     def backup_t(self, evt):
-        self.set_icon('bleu')
         self.backup_item.set_sensitive(False)
+        self.set_icon('bleu')
         self.backup_item.set_label('backup in progress ...')
 
-        self.thread_backup = threading.Thread(target=self.backup, args=(evt))
+        self.thread_backup = threading.Thread(target=self.backup, args=(evt))        
         self.thread_backup.daemon = False       # Daemonize thread
         self.thread_backup.start()              # Start the execution        
         return True
         
-    def backup(self, evt):
-        call(['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh'])    
-        self.backup_item.set_label("Backup")
-        self.backup_item.set_sensitive(True)
-        self.set_icon('vert')
-        return True
+    def backup(self,evt):
+        with self.lock:
+            self.value = 1
+            command=['bash', '/home/nomad/bin/backup-laptop-neuronfarm.sh']
+            result = run(command, stdout=PIPE, stderr=PIPE, universal_newlines=False)
+            print(result.returncode, result.stdout, result.stderr)
+            
+            self.backup_item.set_label("Backup")
+            self.backup_item.set_sensitive(True)
+            self.set_icon('vert')
+            self.value = 0
+            return True
         
     def set_icon(self, color):
         if color == 'violet':
