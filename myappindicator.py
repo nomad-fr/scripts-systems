@@ -117,7 +117,7 @@ def main():
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     menu = gtk.Menu()
     indicator.set_menu(build_menu(menu))
-    GObject.timeout_add(1000, timespent, indicator, menu)
+    # GObject.timeout_add(1000, timespent, indicator, menu)
     gtk.main()  
 
 main()
