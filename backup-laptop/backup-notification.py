@@ -20,8 +20,6 @@ import locale, sys
 
 icon_path = os.path.dirname(os.path.dirname(__file__) + '/icon-backup-notification/') + '/'
 
-print(icon_path)
-
 class IndicatorBackup:
     def __init__(self):
 
