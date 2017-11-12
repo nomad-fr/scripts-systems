@@ -68,7 +68,7 @@ then
 	then
 	    if [ "$1" = "last" ]
 	    then
-		ssh -i $CLEF $USHOST '/home/marty/getlastsnap.sh houyo'
+		ssh -i $CLEF $USHOST '/home/marty/getlastsnap.sh '$VOL
 		exit 0
 	    elif [ "$1" = "host" ]
 	    then
